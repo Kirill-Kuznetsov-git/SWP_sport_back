@@ -151,6 +151,7 @@ class StudentAdmin(ImportMixin, admin.ModelAdmin):
         "is_ill",
         "medical_group",
         "write_to_telegram",
+        "student_status"
     )
 
     readonly_fields = (
