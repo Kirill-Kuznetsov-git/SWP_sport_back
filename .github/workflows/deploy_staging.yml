@@ -9,10 +9,10 @@ on:
 jobs:
   deploy:
     name: Deploy to staging server
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     environment:
-      name: development
-      url: https://stage.sport.innopolis.university
+      name: new-sport-env
+      url: https://new.sport.innopolis.university
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@master
