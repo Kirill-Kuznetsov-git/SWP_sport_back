@@ -2,9 +2,9 @@ from django.db import models
 
 from sport.models import Semester
 
-from django.db.models import DecimalField, Sum, Q
-from django.db.models.expressions import Subquery, OuterRef, ExpressionWrapper, F
-from django.db.models.functions import Coalesce
+from django.db.models import DecimalField, Sum, Q, IntegerField
+from django.db.models.expressions import Subquery, OuterRef, ExpressionWrapper, F, Value
+from django.db.models.functions import Coalesce, Least
 
 
 def get_ongoing_semester() -> Semester:
@@ -44,7 +44,7 @@ class StudentHoursManager(models.Manager):
                                                         filter=Q(attendance__student=F("pk")) &
                                                                Q(attendance__training__group__semester__in=Subquery(previous_semesters_for_current_student.values('id')))), 0))
 
-        qs = qs.annotate(complex_hours=ExpressionWrapper(F('ongoing_semester_hours') + F('last_semesters_hours') - F('debt'), output_field=DecimalField()))
+        qs = qs.annotate(complex_hours=ExpressionWrapper(F('ongoing_semester_hours') + Least(F('last_semesters_hours') - F('debt'), Value(0)), output_field=IntegerField()))
         # print(qs.query)
         # print(qs.values())
         return qs
