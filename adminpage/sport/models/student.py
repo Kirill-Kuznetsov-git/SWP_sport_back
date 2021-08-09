@@ -67,8 +67,8 @@ class Student(models.Model):
         blank=True
     )
 
-    objects = models.Manager()
     objects_with_hours = StudentHoursManager()
+    objects = models.Manager()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
