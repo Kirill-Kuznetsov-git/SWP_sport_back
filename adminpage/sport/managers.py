@@ -16,6 +16,8 @@ def get_ongoing_semester() -> Semester:
 
 
 class StudentHoursManager(models.Manager):
+    use_in_migrations = False
+
     def get_queryset(self):
         qs = super().get_queryset()
 
