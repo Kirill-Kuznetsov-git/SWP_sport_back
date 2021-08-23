@@ -1,9 +1,11 @@
 from sport.models import FAQCategory, FAQElement
 
 
-def get_faq() -> list:
+def get_faq() -> dict:
     """
     Get FAQ
     """
-    result = [{i[0]: {FAQElement.objects.filter(name=i[0])}} for i in FAQCategory.objects.values('name')]
+    result = {}
+    for i in FAQCategory.objects.values('name'):
+        result[i['name']] = list(FAQElement.objects.filter(name=i['name']))
     return result
