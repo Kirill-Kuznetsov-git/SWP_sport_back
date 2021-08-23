@@ -104,6 +104,7 @@ def profile_view(request, **kwargs):
                 "all_hours": get_student_hours(student.pk)['ongoing_semester'],
                 "better_than": better_than(student.pk)
             },
+            #"faq":  TODO
         })
 
     if trainer is not None:
