@@ -29,7 +29,6 @@ async function fetch_detailed_hours(e) {
     const history = await response.json();
     const table = $(`#hours-modal-${semester_id} .modal-body`);
     table.empty();
-    console.log(history.trainings)
     table.append(make_hours_table(history.trainings));
     loaded_hours[semester_id] = true;
 }
@@ -412,10 +411,6 @@ async function submit_reference() {
     try {
         const _URL = window.URL || window.webkitURL;
         const img = await loadImage(_URL.createObjectURL(file));
-        if (img.width < 400 || img.width > 4500 || img.height < 400 || img.height > 4500) {
-            toastr.error('Invalid image width/height, expected them to be in range 400px..4500px');
-            return false;
-        }
     } catch (e) {
         toastr.error('Uploaded file is not an image');
         return false;
@@ -495,7 +490,7 @@ async function submit_self_sport() {
     // }
 
     if (link) {
-        if ((link.startsWith('http://') || link.startsWith('https://')) && link.includes('strava')) {
+        if ((link.startsWith('http://') || link.startsWith('https://')) && link.match('https?://.*strava.*')) {
             formData.append(linkInput.name, link);
         } else {
             toastr.error("You should submit a link to your Strava activity");
@@ -505,7 +500,6 @@ async function submit_self_sport() {
 
     formData.append(typeInput.name, type);
     formData.append('hours', hours);
-    console.log(comment)
     formData.append(commentInput.name, comment);
     formData.append('parsed_data', JSON.stringify(parsed_data));
 

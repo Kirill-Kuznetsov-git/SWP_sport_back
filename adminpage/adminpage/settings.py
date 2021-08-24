@@ -49,6 +49,8 @@ DATE_FORMAT = "%Y-%m-%d"
 # People with passed checkup are able to upload self-sport
 SELFSPORT_MINIMUM_MEDICAL_GROUP_ID = -1
 
+JS_VERSION = "1.0"
+
 SPORT_DEPARTMENT_EMAIL = "sport@innopolis.university"
 STUDENT_AUTH_GROUP_VERBOSE_NAME = "Students"
 STUDENT_AUTH_GROUP_NAME = "S-1-5-21-721043115-644155662-3522934251-2285"
@@ -92,7 +94,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv_boolean("DEBUG")
 PROJECT_ROOT = "/src/"
-ALLOWED_HOSTS = [HOSTNAME, 'nginx']
+ALLOWED_HOSTS = [HOSTNAME, 'adminpanel']
 
 if DEBUG:
     ALLOWED_HOSTS.append('localhost')
@@ -112,7 +114,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django_sendfile',
+    'smartfields',
     'import_export',
     'rangefilter',
     'image_optimizer',
@@ -130,6 +134,7 @@ MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -139,6 +144,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'adminpage.urls'
+
+SITE_ID = 1
 
 TEMPLATES = [
     {
@@ -153,6 +160,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'sport.context_processors.js_version',
             ],
         },
     },

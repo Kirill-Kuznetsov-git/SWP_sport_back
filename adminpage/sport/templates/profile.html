@@ -12,8 +12,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/timegrid/main.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/list/main.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css">
-    <link rel="stylesheet" href="{% static "sport/css/bootstrap-tourist.css" %}">
-    <link rel="stylesheet" href="{% static "sport/css/profile.css" %}">
+    <link rel="stylesheet" href="{% static "sport/css/bootstrap-tourist.css" %}?{{JS_VERSION}}">
+    <link rel="stylesheet" href="{% static "sport/css/profile.css" %}?{{JS_VERSION}}">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
@@ -24,15 +24,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/timegrid/main.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/list/main.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
-    <script src="{% static "sport/js/bootstrap-tourist.js" %}"></script>
-    <script src="{% static "sport/js/modules/networking.mjs" %}"></script>
-    <script src="{% static "sport/js/modules/enrollment.mjs" %}"></script>
-    <script src="{% static "sport/js/modules/calendar.mjs" %}"></script>
-    <script src="{% static "sport/js/modules/modals.mjs" %}"></script>
-    <script src="{% static "sport/js/modules/tour.mjs" %}"></script>
-    <script src="{% static "sport/js/profile.js" %}"></script>
-    <script src="{% static "sport/js/self_sport_reference.js" %}"></script>
-    <script src="{% static "sport/js/swipeCalendar.min.js" %}"></script>
+    <script src="{% static "sport/js/bootstrap-tourist.js" %}?{{JS_VERSION}}"></script>
+    <script src="{% static "sport/js/modules/networking.mjs" %}?{{JS_VERSION}}"></script>
+    <script src="{% static "sport/js/modules/enrollment.mjs" %}?{{JS_VERSION}}"></script>
+    <script src="{% static "sport/js/modules/calendar.mjs" %}?{{JS_VERSION}}"></script>
+    <script src="{% static "sport/js/modules/modals.mjs" %}?{{JS_VERSION}}"></script>
+    <script src="{% static "sport/js/modules/tour.mjs" %}?{{JS_VERSION}}"></script>
+    <script src="{% static "sport/js/profile.js" %}?{{JS_VERSION}}"></script>
+    <script src="{% static "sport/js/self_sport_reference.js" %}?{{JS_VERSION}}"></script>
+    <script src="{% static "sport/js/swipeCalendar.min.js" %}?{{JS_VERSION}}"></script>
 {% endblock %}
 
 {% block content %}
@@ -148,36 +148,29 @@
                         <!-- Debt bar-->
                         <div id="debtor_bar" class="d-none">
                             <div class="progress mt-3" style="width: 100%; height: 2rem;">
-                                <div class="progress-bar progress-bar-striped bg-light" style="width: 100%; height: 2rem; color: red;"><b>Debt</b></div>
+                                <div class="progress-bar progress-bar-striped bg-light text-danger" style="width: 100%; height: 2rem;"><b>Debt</b></div>
                             </div>
                             <div class="progress mb-3" style="width: 100%; height: 2rem">
-                                <div class="progress-bar progress-bar-striped bg-danger" style="width: {{student.debt_hours}}%; height: 2rem">{{student.debt_hours}}h</div>
+                                <div class="progress-bar progress-bar-striped bg-danger" id="debt-subbar"></div>
                             </div>
                         </div>
                         <!-- Self-sport + Sport group bar-->
                         <div class="progress mt-3" style="width: 100%; height: 2rem;">
                             {% if student.is_online %}
-                                <div class="progress-bar bg-light" style="width: 100%; height: 2rem; color: blue"><b>Self-sport</b></div>
+                                <div class="progress-bar bg-light text-primary" style="width: 100%; height: 2rem;"><b>Self-sport</b></div>
                             {% else %}
-                                <div class="progress-bar bg-light" style="width: 40%; height: 2rem; color: blue"><b>Self-sport (max 10h)</b></div>
-                                <div class="progress-bar bg-light" style="width: 60%; height: 2rem; color: green"><b>Sport group</b></div>
+                                <div class="progress-bar bg-light text-primary" style="width: 40%; height: 2rem;"><b>Self-sport (max 10h)</b></div>
+                                <div class="progress-bar bg-light text-info" style="width: 60%; height: 2rem;"><b>Sport group</b></div>
                             {% endif %}
                         </div>
                         <div class="progress mb-3" style="width: 100%; height: 2rem">
                             {% if student.is_online %}
-                                <div class="progress-bar bg-primary" 
-                                    style="width: calc({{student.all_hours.hours_self_not_debt}}%*(100/{{student.all_hours.hours_sem_max}})); height: 2rem">
+                                <div class="progress-bar bg-primary" id="subbar-self-on" style="width: calc({{student.all_hours.hours_self_not_debt}}% * 100 / {{student.all_hours.hours_sem_max}});height: 2rem;">
                                     {{student.all_hours.hours_self_not_debt}}h
                                 </div>
                             {% else %}
-                                <div class="progress-bar bg-primary" 
-                                    style="width: calc({{student.all_hours.hours_self_not_debt}}%*(100/{{student.all_hours.hours_sem_max}})); height: 2rem">
-                                    {{student.all_hours.hours_self_not_debt}}h
-                                </div>
-                                <div class="progress-bar bg-success"
-                                    style="width: calc({{student.all_hours.hours_not_self}}%*(100/{{student.all_hours.hours_sem_max}})); height: 2rem">
-                                    {{student.all_hours.hours_not_self}}h
-                                </div>
+                                <div class="progress-bar bg-primary" id="subbar-self-off"></div>
+                                <div class="progress-bar bg-info" id="subbar-sport"></div>
                             {% endif %}
                         </div>
                         <div id="medical-group-info-modal"></div>
@@ -205,7 +198,7 @@
                                                         <span class="text-uppercase">{{ sem.semester_name }}</span>
                                                     {% endif %}
                                                 </th>
-                                                <td>{{ sem.semester_start }}</td>
+                                                <td>{{ sem.semester_start }}{{forloop.counter0}}</td>
                                                 <td>{{ sem.semester_end }}</td>
                                                 <td>{{ sem.hours }}</td>
                                             </tr>
@@ -305,27 +298,28 @@
                 {% endif %}
 
                 <!-- FAQ -->
-                {% if student %}
+                {% if student and faq|length != 0%}
                 <hr>
                 <h2>FAQ</h2>
+                <div class="accordion" id="accordion-faq">
                     <p class="d-flex justify-content-center align-content-between flex-wrap">
                         {% for category in faq %}
                             <button class="btn btn-sm btn-outline-dark m-1" type="button" data-toggle="collapse"
-                                    data-target="#{{category.id}}" aria-expanded="false" aria-controls="{{category.id}}">
+                                    data-target="#category_{{forloop.counter0}}" aria-expanded="false" aria-controls="category_{{forloop.counter0}}">
                             {{category.name}}
                             </button>
                         {% endfor %}
                     </p>
                     {% for category in faq %}
-                        <div class="collapse" id="{{category.id}}">
-                            {% for element in category %}
+                        <div class="collapse" id="category_{{forloop.counter0}}" data-parent="#accordion-faq">
+                            {% for element in category.values %}
                                 <ul class="list-group list-group-flush">
                                     <li class="list-group-item">
-                                        <h4 class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
-                                            data-target="#{{element.id}}" aria-expanded="false" aria-controls="{{element.id}}">
+                                        <h4 class="btn btn-link btn-block text-left text-reset" type="button" data-toggle="collapse"
+                                            data-target="#a_{{element.id}}" aria-expanded="false" aria-controls="a_{{element.id}}">
                                             <b>{{element.question}}</b>
                                         </h4>
-                                        <div id="{{element.id}}" class="collapse my-3">
+                                        <div id="a_{{element.id}}" class="collapse my-3">
                                             <p class="text-left">
                                             {{element.answer}}
                                             </p>
@@ -335,6 +329,7 @@
                             {% endfor %}
                         </div>
                     {% endfor %}
+                </div>
                 {% endif %}
 
                 {% if student.sport_groups|length > 0 and student.obj.student_status.id == 0 or trainer.sport_groups %}
@@ -401,4 +396,21 @@
 
     <div id="medical-group-info-modal"></div>
     <div id="group-info-modal"></div>
+    <script>
+        const interface_sport_group_hours = Math.max({{student.all_hours.hours_not_self}} - {{student.init_debt_hours}}, 0);
+        const sport_group_hours = interface_sport_group_hours * 100 / {{student.all_hours.hours_sem_max}};
+        const interface_debt_hours = Math.abs({{student.debt_hours}});
+        const debt_hours = interface_debt_hours * 100 / {{student.init_debt_hours}};
+        const self_hours = Math.floor({{student.all_hours.hours_self_not_debt}} * 100 / {{student.all_hours.hours_sem_max}});
+        const interface_self_hours = Math.floor({{student.all_hours.hours_self_not_debt}});
+        const debt_subbar = document.getElementById('debt-subbar');
+        const subbar_sport = document.getElementById('subbar-sport');
+        subbar_sport.setAttribute('style', `width: ${sport_group_hours}%; height: 2rem;`);
+        debt_subbar.setAttribute('style', `width: ${debt_hours}%; height: 2rem;`);
+        debt_subbar.textContent = `${interface_debt_hours}h`;
+        subbar_sport.textContent = `${interface_sport_group_hours}h`;
+        const subbar_self_off = document.getElementById('subbar-self-off');
+        subbar_self_off.setAttribute('style', `width: ${self_hours}%; height: 2rem;`);
+        subbar_self_off.textContent = `${interface_self_hours}h`;
+    </script>
 {% endblock %}
