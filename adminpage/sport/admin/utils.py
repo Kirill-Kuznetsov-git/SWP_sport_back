@@ -7,9 +7,10 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from api.crud import get_ongoing_semester
+from safedelete.admin import SafeDeleteAdmin, SafeDeleteAdminFilter, highlight_deleted
 
 
-class DefaultFilterMixIn(admin.ModelAdmin):
+class DefaultFilterMixIn(SafeDeleteAdmin):
     def changelist_view(self, request, *args, **kwargs):
         from django.http import HttpResponseRedirect
         if hasattr(self, 'semester_filter') and self.semester_filter:

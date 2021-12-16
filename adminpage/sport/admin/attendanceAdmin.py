@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 from openpyxl import Workbook
 from rangefilter.filter import DateRangeFilter
+from safedelete.admin import SafeDeleteAdmin
 
 from sport.admin.utils import cache_filter, cache_dependent_filter, custom_order_filter, DefaultFilterMixIn
 from sport.models import Attendance, Student, Semester
@@ -107,7 +108,7 @@ class AttendanceAdmin(DefaultFilterMixIn):
         "student",
         "training",
         "hours",
-    )
+    ) + SafeDeleteAdmin.list_display
 
     fields = (
         "student",
@@ -157,7 +158,7 @@ class AttendanceAdmin(DefaultFilterMixIn):
                                    select_related=["semester"])
         ),
         "training__group__sport",
-    )
+    ) + SafeDeleteAdmin.list_filter
 
     list_select_related = (
         "student__user",

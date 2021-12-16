@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from safedelete.models import SafeDeleteModel
-from safedelete.models import HARD_DELETE_NOCASCADE
+from safedelete.models import SOFT_DELETE_CASCADE
 
 
 def validate_hours(hours):
@@ -11,7 +11,7 @@ def validate_hours(hours):
 
 
 class Attendance(SafeDeleteModel):
-    _safedelete_policy = HARD_DELETE_NOCASCADE
+    _safedelete_policy = SOFT_DELETE_CASCADE
     training = models.ForeignKey('Training', on_delete=models.SET_NULL, null=True)
     student = models.ForeignKey(
         "Student",

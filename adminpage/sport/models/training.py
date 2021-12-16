@@ -2,8 +2,13 @@ from django.db import models
 from django.db.models import Q, F
 from django.forms.utils import to_current_timezone
 
+from safedelete.models import SafeDeleteModel
+from safedelete.models import SOFT_DELETE_CASCADE
 
-class Training(models.Model):
+
+class Training(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+
     group = models.ForeignKey("Group", on_delete=models.CASCADE)
     schedule = models.ForeignKey("Schedule", on_delete=models.SET_NULL, null=True, blank=True)
     start = models.DateTimeField(null=False)
