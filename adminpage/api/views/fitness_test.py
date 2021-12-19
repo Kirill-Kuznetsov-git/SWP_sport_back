@@ -95,7 +95,7 @@ def get_result(request, **kwargs):
 
     return Response({
         'semester': get_ongoing_semester().name,
-        'grade': total_score >= get_ongoing_semester().points_fitness_test,
+        'grade': total_score >= get_ongoing_semester().points_fitness_test or request.user.student.student_status_id == 0,
         'total_score': total_score,
         'details': result_list,
     })
