@@ -27,14 +27,15 @@ def get_sport_schedule(
         medical_group_condition = Q(allowed_medical_groups__id=student.medical_group.id)
 
     prefetch_query = Schedule.objects.select_related('training_class')
-
+   
     query = Group.objects.prefetch_related(
         'sport',
         'enrolls',
         Prefetch('schedule', queryset=prefetch_query),
     ).filter(
-        Q(sport__id=sport_id) &
+        (Q(sport__id=sport_id) if sport_id != -1 else Q(sport=None)) &
         medical_group_condition &
+        Q(schedule__isnull=False) &
         Q(semester__id=get_ongoing_semester().id)
     ).values(
         'id',

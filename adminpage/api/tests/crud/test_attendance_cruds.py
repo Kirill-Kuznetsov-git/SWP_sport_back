@@ -3,7 +3,7 @@ import unittest
 from datetime import date
 from django.utils import timezone
 
-from api.crud import get_detailed_hours, get_brief_hours, mark_hours, toggle_illness
+from api.crud import get_detailed_hours, get_brief_hours, mark_hours
 from sport.models import Attendance
 
 dummy_date = date(2020, 1, 1)
@@ -40,6 +40,8 @@ def test_mark_hours(student_factory, sport_factory, semester_factory, group_fact
 def test_hours_statistics(student_factory, sport_factory, semester_factory, group_factory, training_factory, attendance_factory):
     student = student_factory("A").student
     other_student = student_factory("B").student
+    student.enrollment_year = 2000
+    student.save()
     sport = sport_factory(name="Sport")
     s1 = semester_factory(name="S19", start=date(2020, 1, 1), end=date(2020, 2, 1))
     s2 = semester_factory(name="S20", start=date(2020, 3, 1), end=date(2020, 4, 1))
@@ -55,23 +57,7 @@ def test_hours_statistics(student_factory, sport_factory, semester_factory, grou
         attendance_factory(training=t, student=student, hours=i + 1)
         attendance_factory(training=t, student=other_student, hours=1)
     brief = get_brief_hours(student)
-    print(brief)
-    print([
-        {
-            "hours": 3,
-            "semester_id": s1.pk,
-            "semester_name": s1.name,
-            'semester_start': s1.start.strftime("%b. %d, %Y"),
-            'semester_end': s1.end.strftime("%b. %d, %Y"),
-        },
-        {
-            "hours": 7,
-            "semester_id": s2.pk,
-            "semester_name": s2.name,
-            'semester_start': s2.start.strftime("%b. %d, %Y"),
-            'semester_end': s2.end.strftime("%b. %d, %Y"),
-        }
-    ])
+
     assertMembers(brief, [
         {
             "hours": 3,

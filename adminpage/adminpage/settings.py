@@ -49,7 +49,7 @@ DATE_FORMAT = "%Y-%m-%d"
 # People with passed checkup are able to upload self-sport
 SELFSPORT_MINIMUM_MEDICAL_GROUP_ID = -1
 
-JS_VERSION = "1.0"
+JS_VERSION = "5.2"
 
 SPORT_DEPARTMENT_EMAIL = "sport@innopolis.university"
 STUDENT_AUTH_GROUP_VERBOSE_NAME = "Students"
@@ -66,7 +66,7 @@ MEDICAL_LEAVE_GROUP_NAME = "Medical leave"
 OTHER_SPORT_NAME = "Other"
 
 TRAINING_EDITABLE_INTERVAL = timedelta(
-    days=int(os.getenv("TRAINING_EDITABLE_INTERVAL", 14))
+    days=2
 )
 
 BACHELOR_STUDY_PERIOD_YEARS = 4
@@ -114,7 +114,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django_sendfile',
+    'smartfields',
     'import_export',
     'rangefilter',
     'image_optimizer',
@@ -126,21 +128,27 @@ INSTALLED_APPS = [
     'sport.apps.SportConfig',
     'api',
     'media',
+    'hijack',
+    'hijack.contrib.admin',
 ]
 
 MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',
+    'hijack.middleware.HijackUserMiddleware',
 ]
 
 ROOT_URLCONF = 'adminpage.urls'
+
+SITE_ID = 1
 
 TEMPLATES = [
     {

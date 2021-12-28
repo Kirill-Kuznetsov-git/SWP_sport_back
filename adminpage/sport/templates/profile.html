@@ -24,6 +24,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/timegrid/main.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/list/main.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+    <script src="{% static "sport/js/csv.min.js" %}?{{JS_VERSION}}"></script>
     <script src="{% static "sport/js/bootstrap-tourist.js" %}?{{JS_VERSION}}"></script>
     <script src="{% static "sport/js/modules/networking.mjs" %}?{{JS_VERSION}}"></script>
     <script src="{% static "sport/js/modules/enrollment.mjs" %}?{{JS_VERSION}}"></script>
@@ -47,17 +48,24 @@
                 <h1 class="card-title">{{ user.get_full_name }}</h1>
                 <hr style="margin-bottom: 4px;">
                 {% if trainer.sport_groups is not None  %}
+                    <span class="badge badge-pill badge-primary text-uppercase mx-1 my-1">
+                            Teacher
+                    </span>
+                    <h3>Work — <span class="badge badge-light text-uppercase">{{ common.semester_name }}</span> semester</h3>
                     {% if trainer.sport_groups|length > 0 %}
-                        <p id="trainer-list">
-                            In semester <b>{{ common.semester_name }}</b> you train the following groups:
+                        <p class="d-flex justify-content-center align-content-between flex-wrap" id="trainer-list">
+                            Teaching groups:
                             {% for group in trainer.sport_groups %}
-                                <span class="badge badge-pill badge-training" id="trainer-span"
-                                      onclick="openGroupInfoModalForTrainer(['/api/group/{{ group.id }}', '/api/attendance/{{ group.id }}/report'])">{{ group.qualified_name }}</span>
+                                <span class="badge badge-info text-uppercase mx-1 my-1" id="trainer-span"
+                                      style="cursor: pointer"
+                                      onclick="openGroupInfoModalForTrainer(['/api/group/{{ group.id }}', '/api/attendance/{{ group.id }}/report'])">
+                                      {{ group.qualified_name }}
+                                </span>
                             {% endfor %}
                         </p>
                     {% else %}
                         <p id="trainer-list">
-                            You are not training in the semester <b>{{ common.semester_name }}</b>
+                            <h4><span class="badge badge-warning">You are not teaching in the current semester</span></h4>
                         </p>
                     {% endif %}
                 {% endif %}
@@ -72,6 +80,9 @@
                                 {{ student.obj.student_status.description }}
                             </span>
                         </h5>
+                        <p>
+                            If your status is incorrect, please contact <a href="https://t.me/loban4">Alexandr Lobanov</a>
+                        </p>
                     {% endif %}
                     {% if student.obj.student_status.id == 2  %}
                         <hr>
@@ -79,7 +90,7 @@
                             Sport types' schedule
                         </a>
                     {% endif %}
-                    <meta id="illness-data" data-ill="{{ student.is_ill }}">
+                    <meta id="QR-data" data-QR="{{ student.has_QR }}">
                     {% if student.obj.student_status.id == 0 %}
                         <p class="d-flex justify-content-center align-content-between flex-wrap">
                             {% if student.is_online %}
@@ -142,46 +153,92 @@
                             Closing the debt is <b>required to pass the sport course</b>.</p>
                         </div>
                         <h3>Progress</h3>
-                        {% if student.better_than is not None %}
+                        <!-- Better than percantage-->
+                        {% if student.better_than is not None and student.better_than >= 30 %}
                             <span>You are better than {{student.better_than}}% of the students!</span>
                         {% endif %}
+                        <!-- Fitness test results -->
+                        <div class="d-none" id="ft-student-results">
+                            <h5 class="text-left ml-3">Fitness test</h5>
+                            <div id="ft-student-results-table" class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Semester</th>
+                                            <th scope="col">Total grade</th>
+                                            <th scope="col">Grade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ft-student-results-table-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal fade" id="ft-results-modal" tabindex="-1" role="dialog">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            Fitness test exercises for the
+                                            <span id="ft-results-modal-sem" class="text-uppercase"></span> 
+                                            semester
+                                        </h5>
+                                        <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div id="ft-results-modal-table" class="table-responsive">
+                                            <table class="table table-sm table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Exercise</th>
+                                                        <th scope="col" class="text-left">Result</th>
+                                                        <th scope="col">Grade</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="ft-results-modal-table-body">
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Hours bars-->
+                        <h5 class="text-left ml-3">Current sport hours</h5>
                         <!-- Debt bar-->
                         <div id="debtor_bar" class="d-none">
                             <div class="progress mt-3" style="width: 100%; height: 2rem;">
-                                <div class="progress-bar progress-bar-striped bg-light" style="width: 100%; height: 2rem; color: red;"><b>Debt</b></div>
+                                <div class="progress-bar progress-bar-striped bg-light text-danger" style="width: 100%; height: 2rem;"><b>Debt</b></div>
                             </div>
                             <div class="progress mb-3" style="width: 100%; height: 2rem">
-                                <div class="progress-bar progress-bar-striped bg-danger" style="width: {{student.debt_hours}}%; height: 2rem">{{student.debt_hours}}h</div>
+                                <div class="progress-bar progress-bar-striped bg-danger" id="debt-subbar"></div>
                             </div>
                         </div>
                         <!-- Self-sport + Sport group bar-->
                         <div class="progress mt-3" style="width: 100%; height: 2rem;">
                             {% if student.is_online %}
-                                <div class="progress-bar bg-light" style="width: 100%; height: 2rem; color: blue"><b>Self-sport</b></div>
+                                <div class="progress-bar bg-light text-primary" style="width: 100%; height: 2rem;"><b>Self-sport</b></div>
                             {% else %}
-                                <div class="progress-bar bg-light" style="width: 40%; height: 2rem; color: blue"><b>Self-sport (max 10h)</b></div>
-                                <div class="progress-bar bg-light" style="width: 60%; height: 2rem; color: green"><b>Sport group</b></div>
+                                <div class="progress-bar bg-light text-primary" style="width: 40%; height: 2rem;"><b>Self-sport (max 10h)</b></div>
+                                <div class="progress-bar bg-light text-info" style="width: 60%; height: 2rem;"><b>Sport group</b></div>
                             {% endif %}
                         </div>
                         <div class="progress mb-3" style="width: 100%; height: 2rem">
                             {% if student.is_online %}
-                                <div class="progress-bar bg-primary" 
-                                    style="width: calc({{student.all_hours.hours_self_not_debt}}%*(100/{{student.all_hours.hours_sem_max}})); height: 2rem">
+                                <div class="progress-bar bg-primary" id="subbar-self-on" style="width: calc({{student.all_hours.hours_self_not_debt}}% * 100 / {{student.all_hours.hours_sem_max}});height: 2rem;">
                                     {{student.all_hours.hours_self_not_debt}}h
                                 </div>
                             {% else %}
-                                <div class="progress-bar bg-primary" 
-                                    style="width: calc({{student.all_hours.hours_self_not_debt}}%*(100/{{student.all_hours.hours_sem_max}})); height: 2rem">
-                                    {{student.all_hours.hours_self_not_debt}}h
-                                </div>
-                                <div class="progress-bar bg-success"
-                                    style="width: calc({{student.all_hours.hours_not_self}}%*(100/{{student.all_hours.hours_sem_max}})); height: 2rem">
-                                    {{student.all_hours.hours_not_self}}h
-                                </div>
+                                <div class="progress-bar bg-primary" id="subbar-self-off"></div>
+                                <div class="progress-bar bg-info" id="subbar-sport"></div>
                             {% endif %}
                         </div>
                         <div id="medical-group-info-modal"></div>
                         {% if student.semesters|length > 0 %}
+                        <h5 class="text-left ml-3">Overall sport hours</h5>
                             <div class="container" id="semester-hours">
                                 <table class="table table-hover">
                                     <thead>
@@ -199,11 +256,7 @@
                                                 onclick="fetch_detailed_hours(this)" data-toggle="modal"
                                                 data-target="#hours-modal-{{ sem.semester_id }}">
                                                 <th scope="row">
-                                                    {% if sem.semester_name == common.semester_name %} 
-                                                        <span class="badge badge-light text-uppercase">{{ sem.semester_name }}</span>
-                                                    {% else %}
-                                                        <span class="text-uppercase">{{ sem.semester_name }}</span>
-                                                    {% endif %}
+                                                    <span class="text-uppercase">{{ sem.semester_name }}</span>
                                                 </th>
                                                 <td>{{ sem.semester_start }}</td>
                                                 <td>{{ sem.semester_end }}</td>
@@ -239,11 +292,6 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="spinner-border" role="status"></div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-primary" data-dismiss="modal">
-                                                            Ok
-                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -303,6 +351,57 @@
                     {% include "med_group_reference.html" %}
                     {% include "self_sport_reference.html" %}
                 {% endif %}
+
+                <!-- FAQ -->
+                {% if student and faq|length != 0%}
+                <hr>
+                <h2>FAQ</h2>
+                <div class="accordion" id="accordion-faq">
+                    <p class="d-flex justify-content-center align-content-between flex-wrap">
+                        {% for category in faq %}
+                            <button class="btn btn-sm btn-outline-dark m-1" type="button" data-toggle="collapse"
+                                    data-target="#category_{{forloop.counter0}}" aria-expanded="false" aria-controls="category_{{forloop.counter0}}">
+                            {{category.name}}
+                            </button>
+                        {% endfor %}
+                    </p>
+                    {% for category in faq %}
+                        <div class="collapse" id="category_{{forloop.counter0}}" data-parent="#accordion-faq">
+                            {% for element in category.values %}
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <h4 class="btn btn-link btn-block text-left text-reset" type="button" data-toggle="collapse"
+                                            data-target="#a_{{element.id}}" aria-expanded="false" aria-controls="a_{{element.id}}">
+                                            <b>{{element.question}}</b>
+                                        </h4>
+                                        <div id="a_{{element.id}}" class="collapse my-3">
+                                            <p class="text-left">
+                                            {{element.answer}}
+                                            </p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+                    {% if student.obj.course is not None %}
+                        <p>
+                            <b>Any other questions?</b> Please contact your course curator
+                            {% if student.obj.course == 1 %}
+                                <a href="https://t.me/crazycopter">Danila Khasanov</a>
+                            {% elif student.obj.course == 2 %}
+                                <a href="https://t.me/edikrvrs">Eduard Shaymardanov</a>
+                            {% elif student.obj.course == 3 %}
+                                <a href="https://t.me/linkainno">Alina Pavlova</a>
+                            {% elif student.obj.course == 4 %}
+                                <a href="https://t.me/rafil_coach">Rafil Galimzianov</a>
+                            {% endif %}
+                        </p>
+                        <a href="https://t.me/loban4">Alexandr Lobanov</a> (if you're English-speaking student)
+                    {% endif %}
+                {% endif %}
+
                 {% if student.sport_groups|length > 0 and student.obj.student_status.id == 0 or trainer.sport_groups %}
                     <hr>
                     <h2>Schedule</h2>
@@ -318,7 +417,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="grading-modal-title">
                         Marking hours for
-                        <span id="grading-group-name"></span>
+                        <span  class="badge badge-info text-uppercase" id="grading-group-name"></span>
                         at
                         <span id="grading-date"></span>
                     </h5>
@@ -327,15 +426,26 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="ui-widget d-flex flex-row my-1">
-                        <form class="student_email_suggestor" onsubmit="return false;">
-                                        <span class="align-text-top"><label
-                                                for="student_emails"><b>Name or email:</b> </label>
-                                            <input id="student_emails" class="stundet_email_pick trainer-editable"
-                                                   size="30">
-                                        </span>
-                        </form>
-                    </div>
+                    <form class="student_email_suggestor" onsubmit="return false;">
+                        <div class="container">
+                        <div class="row align-items-center">
+                                <div class="col-lg-6 col-sm-12 mb-3">
+                                    <input id="student_emails" class="form-control w-100 trainer-editable"
+                                        size="30" placeholder="Enter student name or email">
+                                </div>
+                                <div class="col-lg-6 col-sm-12 mb-3">
+                                    <div class="custom-file">
+                                        <label for="csv-file-input" class="custom-file-label">Upload moodle CSV attendance</label>
+                                        <input name="image" type="file" class="custom-file-input form-control-file trainer-editable"
+                                            accept=".csv"
+                                            id="csv-file-input"
+                                            onchange="csv_upload(this)">
+                                    </div>
+                                </div>
+                        </div>
+                        </div>
+                    </form>
+                    <div class="mb-3">Marked students: <span class="badge badge-dark" id="marked-students">0/0</span></div>
                     <div class="modal-body-table">
 
                     </div>
@@ -367,4 +477,21 @@
 
     <div id="medical-group-info-modal"></div>
     <div id="group-info-modal"></div>
+    <script>
+        const interface_sport_group_hours = Math.max({{student.all_hours.hours_not_self}} - {{student.init_debt_hours}}, 0);
+        const sport_group_hours = interface_sport_group_hours * 100 / {{student.all_hours.hours_sem_max}};
+        const interface_debt_hours = Math.abs({{student.debt_hours}});
+        const debt_hours = interface_debt_hours * 100 / {{student.init_debt_hours}};
+        const self_hours = Math.floor({{student.all_hours.hours_self_not_debt}} * 100 / {{student.all_hours.hours_sem_max}});
+        const interface_self_hours = Math.floor({{student.all_hours.hours_self_not_debt}});
+        const debt_subbar = document.getElementById('debt-subbar');
+        const subbar_sport = document.getElementById('subbar-sport');
+        subbar_sport.setAttribute('style', `width: ${sport_group_hours}%; height: 2rem;`);
+        debt_subbar.setAttribute('style', `width: ${debt_hours}%; height: 2rem;`);
+        debt_subbar.textContent = `${interface_debt_hours}h`;
+        subbar_sport.textContent = `${interface_sport_group_hours}h`;
+        const subbar_self_off = document.getElementById('subbar-self-off');
+        subbar_self_off.setAttribute('style', `width: ${self_hours}%; height: 2rem;`);
+        subbar_self_off.textContent = `${interface_self_hours}h`;
+    </script>
 {% endblock %}

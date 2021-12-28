@@ -3,8 +3,7 @@ from django.db import models
 
 from .attendance import Attendance
 from .enroll import Enroll
-from .enums import MedicalGroups
-from .enums import StudentStatuses
+from .enums import MedicalGroups, StudentStatuses, Gender
 from .group import Group
 from .medical_group import MedicalGroup
 from .medical_group_reference import MedicalGroupReference
@@ -22,6 +21,12 @@ from .training import Training
 from .training_class import TrainingClass
 from .custom_permission import CustomPermission
 from .debt import Debt
+from .faq_category import FAQCategory
+from .faq_element import FAQElement
+from .fitness_test_result import FitnessTestResult
+from .fitness_test_grading import FitnessTestGrading
+from .fitness_test_exercise import FitnessTestExercise
+from .fitness_test_session import FitnessTestSession
 
 DjangoGroup.add_to_class(
     'verbose_name',
