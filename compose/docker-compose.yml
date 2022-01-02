@@ -40,6 +40,26 @@ services:
     environment:
       DEBUG: 'true'
 
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../frontend/Dockerfile
+    restart: always
+    volumes:
+      - ../frontend/pages:/app/pages
+      - ../frontend/public:/app/public
+      - ../frontend/src:/app/src
+      - ../frontend/styles:/app/styles
+      - ../frontend/.eslintrc.json:/app/.eslintrc.json
+      - ../frontend/.prettierrc:/app/.prettierrc
+      - ../frontend/next.config.js:/app/next.config.js
+      - ../frontend/next-env.d.ts:/app/next-env.d.ts
+      - ../frontend/tsconfig.json:/app/tsconfig.json
+      - ../frontend/package.json:/app/package.json
+      - ../frontend/package-lock.json:/app/package-lock.json
+#    depends_on:
+#      - adminpanel
+
   db:
     image: db
     build:

@@ -4,7 +4,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from .views import *
 
 urlpatterns = [
-    path('', login_redirect, name="login"),
+    path('login/', login_redirect, name="login"),
     path('profile/', profile_view, name='profile'),
     path('category/', category_view, name='category'),
     path('fitness_test/', fitness_test_view, name='fitness_test'),
