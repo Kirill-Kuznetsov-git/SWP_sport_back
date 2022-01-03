@@ -2,7 +2,7 @@
   "parser": "typescript",
   "arrowParens": "always",
   "printWidth": 120,
-  "jsxBracketSameLine": false,
+  "bracketSameLine": false,
   "jsxSingleQuote": false,
   "endOfLine": "auto",
   "semi": true,

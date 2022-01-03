@@ -50,7 +50,7 @@ services:
       - ../frontend/public:/app/public
       - ../frontend/src:/app/src
       - ../frontend/styles:/app/styles
-      - ../frontend/.eslintrc.json:/app/.eslintrc.json
+      - ../frontend/.eslintrc.js:/app/.eslintrc.js
       - ../frontend/.prettierrc:/app/.prettierrc
       - ../frontend/next.config.js:/app/next.config.js
       - ../frontend/next-env.d.ts:/app/next-env.d.ts
