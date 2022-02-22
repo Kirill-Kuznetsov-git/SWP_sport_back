@@ -1,3 +1,6 @@
+# Attention! The project transferred to https://github.com/InnopolisSport/SWP_sport_back. This repo is archived and deprecated.
+#
+#
 # [SWP] SportComplex service
 
 ![Tests](https://github.com/WinnerOK/SWP_sport_back/workflows/Tests/badge.svg)
